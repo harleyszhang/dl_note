@@ -9,6 +9,10 @@ categories: DeepLearning
 - [一 理解张量维度](#一-理解张量维度)
 - [二 理解 dim 参数](#二-理解-dim-参数)
 - [三 规约计算](#三-规约计算)
+  - [3.1 torch.mean](#31-torchmean)
+  - [3.2 torch.sum](#32-torchsum)
+  - [3.3 torch.max](#33-torchmax)
+  - [3.4 torch.cumprod](#34-torchcumprod)
 
 PyTorch 张量数学运算就是对张量的元素值完成数学运算，常用的张量数学运算包括：标量运算、向量运算、矩阵运算。
 
@@ -98,7 +102,9 @@ tensor([[5.0000, 5.0000, 4.3333, 2.6667, 5.3333],
 
 规约计算一般是指分组聚合计算，表现结果就是会进行维度压缩。
 
-1，torch.mean 函数用于计算张量沿指定维度的平均值。其基本语法和参数解释如下：
+### 3.1 torch.mean
+
+torch.mean 函数用于计算张量沿指定维度的平均值。其基本语法和参数解释如下：
 
 ```python
 torch.mean(input, dim, keepdim=False, *, dtype=None) -> Tensor
@@ -116,8 +122,13 @@ torch.mean(input, dim, keepdim=False, *, dtype=None) -> Tensor
 2. 从输出张量的形状理解：
    - NLP 领域的 3D 张量，dim = 2，输出张量的形状去掉这个 dim 维度，得到输出张量形状为 `(batch_size, sequence_length)`。
    - CV 领域的 4D 张量，dim = 0，输出张量形状为 `(channels, height, width)`。
+3. 是否保留维度参数的理解：
+	- keepdim=False（默认）：求和后，指定的维度会被压缩，即结果张量的维度将减少。
+	- keepdim=True：求和后，指定的维度将保留，且其大小为 1，这对于后续需要特定维度的操作（如广播机制）非常有用。
+  
+### 3.2 torch.sum
 
-2，`torch.sum` 沿着指定维度求和。
+`torch.sum` 沿着指定维度求和。
 ```bash
 >>> x = torch.randn([4,5])
 >>> x
@@ -133,7 +144,9 @@ tensor([ 2.5269, -2.0317, -1.2381,  0.7056])
 
 当 dim = 0 时，就是沿着 `dim = 0`即 `x` 轴进行累加，sum 函数为规约函数会压缩维度，所以x.sum(dim=0) 结果为 tensor([-0.6453,  2.1187,  0.3796, -1.0821, -0.8082])，形状为 `[5]`。
 
-3，`torch.max()` 用于获取张量的最大值，其有三种用法：
+### 3.3 torch.max
+
+`torch.max()` 用于获取张量的最大值，其有三种用法：
 
 - 获取张量中的最大值。
 - 沿指定维度获取最大值及其索引。
@@ -176,7 +189,9 @@ tensor([5, 6, 5, 7, 7])
 
 `torch.min` 函数和 `torch.max()` 意义相同，只不过返回的是最小值。
 
-4，`torch.cumprod` 张量沿着指定 dim 维度计算累积乘积，其返回一个与 `input` 形状相同的张量，返回张量的每个元素是指定维度上该元素及其之前所有元素的乘积。函数定义(语法)如下:
+### 3.4 torch.cumprod
+
+`torch.cumprod` 张量沿着指定 dim 维度计算累积乘积，其返回一个与 `input` 形状相同的张量，返回张量的每个元素是指定维度上该元素及其之前所有元素的乘积。函数定义(语法)如下:
 
 ```python
 torch.cumprod(input, dim, *, dtype=None, out=None) -> Tensor
@@ -185,7 +200,7 @@ torch.cumprod(input, dim, *, dtype=None, out=None) -> Tensor
 这个沿着 dim 方向计算累积的计算过程直观上不好理解，可以参考下述计算过程的可视化分解图来理解。
 
 <div align="center">
-<img src="../../images/pytorch_tensor_math/dim_compute_visual.png" width="60%" alt="dim_compute_visual">
+<img src="../images/pytorch_tensor_math/dim_compute_visual.png" width="80%" alt="dim_compute_visual">
 </div>
 
 多维张量的示例代码如下所示:

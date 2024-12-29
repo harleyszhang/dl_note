@@ -1,18 +1,19 @@
 - [一，张量的基本操作](#一张量的基本操作)
   - [1.1 改变形状: view 和 reshape](#11-改变形状-view-和-reshape)
+  - [1.2 张量拼接](#12-张量拼接)
 - [二，维度变换](#二维度变换)
-  - [2.1，unsqueeze vs squeeze 维度增减](#21unsqueeze-vs-squeeze-维度增减)
+  - [2.1 unsqueeze vs squeeze 维度增减](#21-unsqueeze-vs-squeeze-维度增减)
   - [2.2，transpose vs permute 维度交换](#22transpose-vs-permute-维度交换)
-- [三，索引切片](#三索引切片)
-  - [3.1，规则索引切片方式](#31规则索引切片方式)
-  - [3.2，gather 和 torch.index\_select 算子](#32gather-和-torchindex_select-算子)
+- [三 索引切片](#三-索引切片)
+  - [3.1 规则索引切片方式](#31-规则索引切片方式)
+  - [3.2 gather 和 torch.index\_select 算子](#32-gather-和-torchindex_select-算子)
 - [四，合并分割](#四合并分割)
   - [4.1，torch.cat 和 torch.stack](#41torchcat-和-torchstack)
-  - [4.2，torch.split 和  torch.chunk](#42torchsplit-和--torchchunk)
-- [五，卷积相关算子](#五卷积相关算子)
-  - [5.1，上采样方法总结](#51上采样方法总结)
+  - [4.2 torch.split 和  torch.chunk](#42-torchsplit-和--torchchunk)
+- [五 卷积相关算子](#五-卷积相关算子)
+  - [5.1 上采样方法总结](#51-上采样方法总结)
   - [5.2，F.interpolate 采样函数](#52finterpolate-采样函数)
-  - [5.3，nn.ConvTranspose2d 反卷积](#53nnconvtranspose2d-反卷积)
+  - [5.3 nn.ConvTranspose2d 反卷积](#53-nnconvtranspose2d-反卷积)
 - [参考资料](#参考资料)
 
 > 授人以鱼不如授人以渔，原汁原味的知识才更富有精华，本文只是对张量基本操作知识的理解和学习笔记，看完之后，想要更深入理解，建议去 pytorch 官方网站，查阅相关函数和操作，英文版在[这里](https://pytorch.org/docs/1.7.0/torch.html)，中文版在[这里](https://pytorch-cn.readthedocs.io/zh/latest/package_references/torch/#tensors)。本文的代码是在 `pytorch1.7` 版本上测试的，其他版本一般也没问题。
@@ -36,9 +37,34 @@
 
 > 更多理解可以参考这篇[文章](https://blog.csdn.net/Flag_ing/article/details/109129752)。
 
+### 1.2 张量拼接
+
+`torch.concat`（别名 torch.cat）用于沿着指定维度拼接张量的操作。语法：`torch.cat(tensors, dim=0)`。
+
+- `tensors`：一个包含待拼接张量的序列（如列表或元组）。
+- `dim`：指定沿哪一个维度进行拼接。
+
+示例代码
+
+```bash
+>>> import torch
+>>> A = torch.tensor([[1, 2], [3, 4]]) # 形状 [2, 2]
+>>> B = torch.tensor([[5, 6], [7, 8]]) # 形状 [2, 2]
+>>> C = torch.concat([A, B], dim = 0)
+>>> C
+tensor([[1, 2],
+        [3, 4],
+        [5, 6],
+        [7, 8]])
+>>> C2 = torch.concat([A, B], dim = 1)
+>>> C2
+tensor([[1, 2, 5, 6],
+        [3, 4, 7, 8]])
+```
+
 ## 二，维度变换
 
-### 2.1，unsqueeze vs squeeze 维度增减
+### 2.1 unsqueeze vs squeeze 维度增减
 
 - `torch.squeeze`: 默认用于移除张量中所有大小为 1 的维度。
 - `torch.unsqueeze`: 用于在指定位置插入一个大小为 1 的维度，从而增加张量的维度。
@@ -91,8 +117,10 @@ print(b.transpose(1, 3).transpose(1, 2).shape)   # torch.Size([1, 28, 32, 3])
  
 print(b.permute(0,2,3,1).shape)                  # torch.Size([1, 28, 28, 3]
 ```
-## 三，索引切片
-### 3.1，规则索引切片方式
+## 三 索引切片
+
+### 3.1 规则索引切片方式
+
 张量的索引切片方式和 `numpy`、python 多维列表几乎一致，都可以通过索引和切片对部分元素进行修改。切片时支持缺省参数和省略号。实例代码如下：
 ```python
 >>> t = torch.randint(1,10,[3,3])
@@ -118,7 +146,8 @@ tensor([[2, 9],
         [3, 9]])
 ```
 以上切片方式相对规则，对于不规则的切片提取,可以使用 `torch.index_select`, `torch.take`, `torch.gather`, `torch.masked_select`。
-### 3.2，gather 和 torch.index_select 算子
+
+### 3.2 gather 和 torch.index_select 算子
 > `gather` 算子的用法比较难以理解，在翻阅了官方文档和网上资料后，我有了一些自己的理解。
 
 1，`gather` 是不规则的切片提取算子（Gathers values along an axis specified by dim. 在指定维度上根据索引 index 来选取数据）。函数定义如下：
@@ -186,6 +215,7 @@ output[1][1] = input[1][index[1][1]] = input[1][0] = 3
 ```
 
 总结：**可以看到 `gather` 是通过将索引在指定维度 `dim` 上的值替换为 `index` 的值，但是其他维度索引不变的情况下获取 `tensor` 数据**。直观上可以理解为对矩阵进行重排，比如对每一行(dim=1)的元素进行变换，比如 `torch.gather(a, 1, torch.tensor([[1,2,0], [1,2,0]]))` 的作用就是对 矩阵 `a` 每一行的元素，进行 `permtute(1,2,0)` 操作。
+
 2，理解了 `gather` 再看 `index_select` 就很简单，函数作用是返回沿着输入张量的指定维度的指定索引号进行索引的张量子集。函数定义如下：
 
 ```python
@@ -272,7 +302,8 @@ tensor([[[ 0,  1,  2],
 
 ![hstack_visual](../../images/pytorch_tensor_structure/hstack_visual.png)
 
-### 4.2，torch.split 和  torch.chunk
+### 4.2 torch.split 和  torch.chunk
+
 `torch.split()` 和 `torch.chunk()` 可以看作是 `torch.cat()` 的逆运算。`split()` 作用是将张量拆分为多个块，每个块都是原始张量的视图。`split()` [函数定义](https://pytorch.org/docs/stable/generated/torch.split.html#torch.split)如下：
 ```python
 """
@@ -327,8 +358,9 @@ tensor([[1],
         [7],
         [9]]))
 ```
-## 五，卷积相关算子
-### 5.1，上采样方法总结
+
+## 五 卷积相关算子
+### 5.1 上采样方法总结
 上采样大致被总结成了三个类别：
 1. 基于线性插值的上采样：最近邻算法（`nearest`）、双线性插值算法（`bilinear`）、双三次插值算法（`bicubic`）等，这是传统图像处理方法。
 2. 基于深度学习的上采样（转置卷积，也叫反卷积 `Conv2dTranspose2d`等）
@@ -359,7 +391,7 @@ y = F.interpolate(x * 2, scale_factor=(2, 2), mode='bilinear').squeeze(0)
 print(y.shape)   # torch.Size([3, 224, 224)
 ```
 
-### 5.3，nn.ConvTranspose2d 反卷积
+### 5.3 nn.ConvTranspose2d 反卷积
 
 转置卷积（有时候也称为反卷积，个人觉得这种叫法不是很规范），它是一种特殊的卷积，先 `padding` 来扩大图像尺寸，紧接着跟正向卷积一样，旋转卷积核 180 度，再进行卷积计算。
 
