@@ -1,4 +1,5 @@
 - [项目概述](#项目概述)
+- [我的自制大模型推理框架课程介绍](#我的自制大模型推理框架课程介绍)
 - [一，数学和编程基础专栏](#一数学和编程基础专栏)
 - [二，神经网络基础部件](#二神经网络基础部件)
 - [三，经典卷积神经网络模型](#三经典卷积神经网络模型)
@@ -12,7 +13,56 @@
 
 本仓库项目是个人总结的计算机视觉和大语言模型学习笔记，包含深度学习基础知识、神经网络基础部件详解、深度学习炼丹策略、深度学习模型压缩算法、深度学习推理框架代码解析及动手实战。
 
-`LLM` 基础及推理优化的专栏笔记请参考[llm_note](https://github.com/HarleysZhang/llm_note)仓库。
+`LLM` 基础及推理优化的专栏笔记请参考 [llm_note](https://github.com/HarleysZhang/llm_note) 仓库。
+
+## 我的自制大模型推理框架课程介绍
+
+1. **框架亮点**：基于 Triton + PyTorch 开发的轻量级、且简单易用的大模型推理框架，采用类 Pytorch 语法的 Triton 编写算子，绕开 Cuda 复杂语法实现 GPU 加速。
+2. **价格：499**。非常实惠和便宜，课程、项目、面经、答疑质量绝对对得起这个价格。
+3. **课程优势​**：
+   - **手把手教你从 0 到 1 实现大模型推理框架**。
+   - 项目导向 + 面试导向 + **分类总结的面试题**。
+   - 2025 最新的高性能计算/推理框架岗位的大厂面试题汇总
+4. **项目优势​**：
+	- 架构清晰，代码简洁且注释详尽，覆盖大模型离线推理全流程。​
+    - 运用 OpenAI Triton 编写高性能计算 Kernel，开发矩阵乘法内核，效率堪比 cuBLAS。​
+    - 依托 PyTorch 进行高效显存管理。​
+    - 课程项目完美支持 FlashAttentionV1、V2、V3 与 `GQA`，以及 `PageAttention` 的具体实现。​
+    - 使用 `Triton` 编写融合算子，如 KV 线性层融合等。​
+    - 适配最新的 `llama/qwen2.5/llava1.5` 模型，相较 transformers 库，在 llama3 1B 和 3B 模型上，加速比最高可达 `4` 倍。
+5. **分类总结部分面试题**：
+
+<table style="width: 100%; table-layout: fixed;">
+  <tr>
+    <td align="center"><img src="./images/read_me/interview1.png" width="100%" alt="llava_output2"></td>
+    <td align="center"><img src="./images/read_me/interview2.png" width="100%" alt="llava_output"></td>
+  </tr>
+</table>
+
+6. **项目运行效果**:
+
+`llama3.2-1.5B-Instruct` 模型流式输出结果测试：
+
+![流式输出](./images/read_me/generate.gif)
+
+`Qwen2.5-3B` 模型（社区版本）流式输出结果测试：
+
+![流式输出](./images/read_me/output.gif)
+
+`Llava1.5-7b-hf` 模型流式输出结果测试:
+
+<table style="width: 100%; table-layout: fixed;">
+  <tr>
+    <td align="center"><img src="./images/read_me/llava_output2.gif" width="90%" alt="llava_output2"></td>
+    <td align="center"><img src="./images/read_me/llava_output1.gif" width="100%" alt="llava_output"></td>
+  </tr>
+</table>
+
+感兴趣的同学可以扫码联系课程购买，这个课程是我和[《自制深度学习推理框架》作者](https://space.bilibili.com/1822828582)一起合力打造的，内容也会持续更新优化。
+
+<div align="center">
+<img src="./images/read_me/fu_qcode.jpg" width="40%" alt="transformer_block_mp">
+</div>
 
 ## 一，数学和编程基础专栏
 
