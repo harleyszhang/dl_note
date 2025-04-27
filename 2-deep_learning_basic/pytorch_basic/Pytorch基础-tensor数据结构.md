@@ -1,18 +1,27 @@
-- [一 Tensor 概述](#一-tensor-概述)
+---
+layout: post
+title: Pytorch基础-tensor数据结构
+date: 2021-03-07 12:00:00
+summary: torch.Tensor 是一种包含单一数据类型元素的多维矩阵，类似于 numpy 的 array，本文详细介绍了 Tensor 的数据类型、属性以及如何创建。
+categories: DeepLearning
+---
+
+- [Tensor 概述](#tensor-概述)
   - [1.1 Tensor 数据类型](#11-tensor-数据类型)
   - [1.2 Tensor 的属性](#12-tensor-的属性)
 - [二 创建 Tensor](#二-创建-tensor)
   - [2.1 传数据的方法创建 Tensor](#21-传数据的方法创建-tensor)
   - [2.2 传 size 的方法创建 Tensor](#22-传-size-的方法创建-tensor)
   - [2.3 其他创建 tensor 的方法](#23-其他创建-tensor-的方法)
+  - [2.4 代码示例](#24-代码示例)
   - [创建张量方法总结](#创建张量方法总结)
 - [参考资料](#参考资料)
 
-## 一 Tensor 概述
+## Tensor 概述
 
 `torch.Tensor` 是一种包含**单一数据类型**元素的多维矩阵，类似于 numpy 的 `array`。
 
-![tensor](../../images/tensor_datastructure/tensor.png)
+![tensor](../../images//tensor_datastructure/tensor.png)
 
 1，指定数据类型的 tensor 可以通过传递参数 `torch.dtype` 和/或者 `torch.device` 到构造函数生成：
 > 注意为了改变已有的 tensor 的 torch.device 和/或者 torch.dtype, 考虑使用 `to()` 方法.
@@ -104,7 +113,7 @@ print(type(t))
 
 Torch 定义了七种 CPU Tensor 类型和八种 GPU Tensor 类型：
 
-![tensor数据类型](../../images/tensor_datastructure/tensor_data_types.png)
+![tensor数据类型](../../images//tensor_datastructure/tensor_data_types.png)
 
 `torch.Tensor` 是默认的 tensor 类型（`torch.FloatTensor`）的简称，即 `32` 位浮点数数据类型。
 
@@ -219,11 +228,21 @@ array([[  1,   2,   3],
        [  4,   5, 100]])
 ```
 
-3，`torch.empty_like`、`torch.zeros_like`、`torch.ones_like`、`torch.randint_like()`等
+3，`torch.empty_like`、`torch.zeros_like`、`torch.ones_like` 和 `torch.randint_like()`。
+
+- 前面三个函数是根据 input（tensor 数据） 形状创建空、全 0 和全 1 的张量。
+- `torch.randint_like()`：返回和输入 tensor 形状相同的张量，但是数据范围由输入参数指定，在 `[low=0, high]` 之间均匀生成的随机整数。
+
+`torch.empty_like` 和 `torch.randint_like()` 函数声明如下所示：
+
 ```python
 torch.empty_like(input, *, dtype=None,) -> Tensor
+# torch.ones_like 和 torch.zeros_like 几乎一致
+torch.zeros_like(input, *, dtype=None, layout=None, device=None, requires_grad=False, memory_format=torch.preserve_format) → Tensor
+torch.randint_like(input, low=0, high, \*, dtype=None, layout=torch.strided, device=None, requires_grad=False, memory_format=torch.preserve_format) → Tensor
 ```
-根据 input（tensor 数据） 形状创建空、全 0 和全 1 的张量。
+
+`torch.empty_like` 和 `torch.zeros_like` 的简单函数实例如下所示：
 
 ```python
 arr = np.arange(20).reshape(5, 4)
@@ -297,7 +316,7 @@ torch.arange(start=0, end, step=1, out=None, dtype=None, layout=torch.strided, d
 
 2，`torch.normal()`
 
-根据给定的均值 (mean=0) 和标准差 (std=1) 从正态分布中抽取随机样本。每个生成的元素都是独立的随机变量，遵循相同的正态分布。
+根据给定的均值 (mean=0) 和标准差 (std=1) 从正态分布中抽取随机样本。每个生成的元素都是独立的随机变量，**遵循相同的正态分布**。
 
 值的注意的是，当我们生成一个有限大小的样本（例如 3x3 共9个元素）时，样本的均值和标准差并不一定严格等于总体的均值和标准差。这是因为：
 
@@ -325,7 +344,7 @@ torch.normal(mean, std, size, *, out=None) → Tensor
 
 3，`torch.randn()` 或 `torch.randn_like()`
 
-功能：返回形状为 `size` 的一个张量，张量中的随机数来自均值为 0、方差为 1 的正态分布（也称为标准正态分布）。这里计算 `torch.mean(4,5).mean()` 的结果不为 0 的原因分析和上面一样，不再说明。
+功能：返回一个形状为 `size` 的张量，张量中的随机数来自均值为 0、方差为 1 的正态分布（也称为标准正态分布）。
 
 ```python
 torch.randn(*size, *, generator=None, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False, pin_memory=False) → Tensor
@@ -333,7 +352,7 @@ torch.randn(*size, *, generator=None, out=None, dtype=None, layout=torch.strided
 
 4，`torch.randint()` 和 `torch.randint_like()`
 
-功能：在区间 `[low, high)` 上生成指定形状 `size` 且均匀分布随机整数张量。
+功能：**返回一个与 Tensor input 形状相同的张量，其中填充了区间 `[low, high)` 之间均匀生成的随机整数。**
 
 ```python
 torch.randint（low=0， high， size， *， generator=None， out=None， dtype=None， layout=torch.strided， device=None， requires_grad =False）-> Tensor
@@ -350,7 +369,8 @@ torch.tril(input, diagonal=0, *, out=None) → Tensor
 
 参数 `diagonal` 控制要保留的对角线。如果 diagonal = 0，则保留主对角线及其以下的所有元素。正值的 diagonal 会包括主对角线上方的对角线，负值则排除主对角线下方的对角线，即表示向上或向下偏移的对角线。主对角线的索引为  ${(i, i)}$ ，其中 $i \in [0, \min \{d_1, d_2\} - 1]$， $d_1$ 和 $d_2$ 分别为矩阵的维度。
 
-代码示例:
+### 2.4 代码示例
+
 ```python
 >>> torch.arange(12).reshape(4,3)               # torch.arange() 用法
 tensor([[ 0,  1,  2],
@@ -459,15 +479,16 @@ if __name__ == "__main__":
 Tensor Size: (3, 3), by torch.normal, Mean: 0.4151, Std Dev: 0.6608
 Tensor Size: (100, 100), by torch.normal, Mean: -0.0135, Std Dev: 0.9947
 Tensor Size: (1000, 1000), by torch.normal, Mean: 0.0002, Std Dev: 1.0006
+
 Tensor Size: (3, 3), by torch.randn, Mean: -0.7619, Std Dev: 1.1099
 Tensor Size: (100, 100), by torch.randn, Mean: -0.0133, Std Dev: 1.0029
 Tensor Size: (1000, 1000), by torch.randn, Mean: -0.0001, Std Dev: 1.0001
 ```
 
 解释：
-- $3\times 3$ 张量: 样本均值和标准差有较大的偏差。
+- $3\times 3$ 张量: 样本均值、标准差和 0、1 比都有较大的偏差。
 - $100\times 100$ 张量: 偏差减小，均值更接近0，标准差更接近1。
-- $1000\times 1000$ 张量: 偏差进一步减小，均值非常接近0，标准差非常接近1。
+- $1000\times 1000$ 张量: 偏差进一步减小，**均值非常接近0，标准差非常接近1**。
 
 ### 创建张量方法总结
 
