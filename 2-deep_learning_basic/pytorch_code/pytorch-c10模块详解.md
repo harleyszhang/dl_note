@@ -5,7 +5,7 @@
   - [2.2 Stream python 类](#22-stream-python-类)
 - [三 Event 类](#三-event-类)
   - [3.1 Event 类](#31-event-类)
-- [三 设备管理工具类-InlineDeviceGuard](#三-设备管理工具类-inlinedeviceguard)
+- [四 设备管理工具类-InlineDeviceGuard](#四-设备管理工具类-inlinedeviceguard)
 - [参考资料](#参考资料)
 
 ## 一 c10 模块概述
@@ -439,7 +439,7 @@ struct InlineEvent final {
 
 ```
 
-## 三 设备管理工具类-InlineDeviceGuard
+## 四 设备管理工具类-InlineDeviceGuard
 
 c10/core/impl/InlineDeviceGuard.h 文件定义了 PyTorch 中的设备管理工具类 `InlineDeviceGuard` 和 InlineOptionalDeviceGuard，用于通过 `RAII` 机制安全地设置和恢复计算设备（如 CPU/GPU）。以下是核心要点：
 1. `InlineDeviceGuard`:
