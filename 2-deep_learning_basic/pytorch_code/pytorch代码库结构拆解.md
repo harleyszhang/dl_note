@@ -8,6 +8,7 @@ categories: Framework_analysis
 
 - [1. pytorch 代码库结构](#1-pytorch-代码库结构)
 - [2. c10 核心基础库](#2-c10-核心基础库)
+- [3. ATen 模块](#3-aten-模块)
 - [参考资料](#参考资料)
 
 ## 1. pytorch 代码库结构
@@ -71,6 +72,35 @@ PyTorch 2.x 的源码主要划分为多个顶级目录，每个目录承担不�
 	- c10/xpu 则可能用于其他加速器（如 Intel XPUs）。
 - `c10/mobile/`：移动端支持代码，为在移动/嵌入式场景下裁剪和优化 PyTorch 而设。
 - `c10/test/`：c10 本身的一些单元测试代码。
+
+## 3. ATen 模块
+
+aten/（A Tensor Library）是 PyTorch 的核心组件，负责实现 Tensor 计算、自动微分（Autograd）、跨后端算子分发、算子在各个设备（cuda、cpu）上具体实现（aten/src/ATen/native/）。
+
+aten/src/ATen/目录提供了 aten 模块的具体代码实现，核心子目录的作用如下所示：
+- core/ ：核心函数库，逐步往 c10迁移中。定义 Tensor 的核心数据结构、类型系统和 API。
+- native/：原生算子库。各后端（CPU、CUDA、XLA 等）的算子实际实现（如卷积、矩阵乘法）。
+- autograd/：自动微分引擎（如 Variable、Function 的实现）。
+- vulkan/、metal/：移动端和 GPU 后端支持。
+- quantized/：量化算子实现。
+
+aten/src/ATen/core 子模块
+- 作用：定义 Tensor 的核心数据结构、类型系统和基础接口。
+- 关键文件：
+  - Tensor.h：Tensor 类的定义（核心分析对象）。
+  - TensorBase.h：Tensor 的基类，提供轻量级接口。
+  - DispatchKeySet.h：操作符分派机制（如 CPU/CUDA/Autograd 的动态分派）。
+  - ScalarType.h：数据类型（dtype）的枚举定义。
+
+aten/src/ATen/native 子模块
+- 作用：各后端的原生算子实现。
+- 关键子目录：
+  - cpu/：CPU 算子实现（如 Conv2d.cpp）。
+  - cuda/：CUDA 算子实现（如 CUDABlas.cpp）。
+  - Composite/：组合算子（由基础算子拼接而成）。
+  - meta/：元算子（用于形状推导）。
+
+![aten_code_summary](../../images/pytorch/aten_code_summary.png)
 
 ## 参考资料
 
