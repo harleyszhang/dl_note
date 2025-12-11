@@ -1,10 +1,8 @@
-## SSH 概述
-
 `SSH`（安全外壳协议 Secure Shell Protocol，简称SSH）是一种加密的网络传输协议，用于在网络中实现客户端和服务端的连接，典型的如我们在本地电脑通过 `SSH`连接远程服务器，从而做开发，Windows、macOS、Linux都有自带的 `SSH` 客户端，但是在Windows上使用 `SSH` 客户端的体验并不是很好，所以我们一般使用 `Xshell` 来代替。
 
-## 一，准备工作
+## 一 准备工作
 
-### 1.1, 安装 SSH 客户端
+### 1.1 安装 SSH 客户端
 
 为了建立 SSH 远程连接，需要两个组件：客户端和相应服务端组件，SSH 客户端是我们安装在本地电脑的软件；而服务端，也需有一个称为 SSH 守护程序的组件，它不断地侦听特定的 TCP/IP 端口以获取可能的客户端连接请求。 一旦客户端发起连接，SSH 守护进程将以软件和它支持的协议版本作为响应，两者将交换它们的标识数据。如果提供的凭据正确，SSH 会为适当的环境创建一个新会话。
 
@@ -15,7 +13,7 @@ MacOS 系统自带 SSH 客户端，可以直接使用，Windows 系统需要安�
 OpenSSH_7.4p1, OpenSSL 1.0.2k-fips  26 Jan 2017
 ```
 
-### 1.2, 安装 SSH 服务端
+### 1.2 安装 SSH 服务端
 
 Linux 系统检查 ssh 服务端是否可用的命令有好几种，比如直接看是否有 `ssh` 进程在运行:
 
@@ -46,15 +44,15 @@ ps -ef | grep ssh
 ssh localhost # 不同 Linux 系统输出可能不一样
 ```
 
-## 二，基于密码的登录连接
+## 二 基于密码的登录连接
 
 典型用法，只需输入以下命令即可连接远程服务器。
     
 ```bash
 # ssh连接默认端口是22，如果本地机用户名和远程机用户名一致，可以省略用户名
-ssh username@host
+ssh username@host_ip
 # 也可以指定连接端口
-ssh -p port user@host
+ssh -p port user@host_ip
 ```
 
 上述命令是典型的 SSH 连接远程服务器的命令，如果是第一次连接运行后会得到以下提示，正常输入 `yes`，然后输入账号密码即可连接成功:
@@ -68,7 +66,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Last login: Tue Feb 28 15:33:06 2023 from xx.xx.xx.xx
 ```
 
-## 三，基于公钥登录连接
+## 三 基于公钥登录连接
 
 前面的命令是通过密码（私钥）登录，这样比较麻烦，因为每次登录我们都需要**输入密码**，因此我们可以选择 SSH 的公钥登录连接方式，省去输入密码的步骤。
 
@@ -81,15 +79,15 @@ SSH 支持多种用于身份验证密钥的公钥算法, 包括 RSA、DSA、ECDS
 - `-t` 参数指定密钥类型
 - `-b` 参数指定密钥长度
 
-基于公钥登录连接的具体步骤如下:
+### 3.1 多行命令配置
 
-1，**本地终端**运行 `ssh-keygen -t rsa -b 4096` 命令生成密钥对，运行后会提示输入密钥保存路径，直接回车即可，保存在默认路径下，然后会提示输入密钥密码，这里我们不设置密码，直接回车即可，然后会提示再次输入密码，这里也不设置密码，直接回车即可，最后会提示密钥生成成功，如下图所示，可以看出 `~/.ssh/` 目录下，会新生成两个文件：`id_rsa.pub` 和 `id_rsa`，分别是公钥和私钥文件。
+**基于公钥登录连接（多个命令）的具体步骤如下**:
+
+**本地终端**运行 `ssh-keygen -t rsa -b 4096` 命令生成密钥对，运行后会提示输入密钥保存路径，直接回车即可，保存在默认路径下，然后会提示输入密钥密码，这里我们不设置密码，直接回车即可，然后会提示再次输入密码，这里也不设置密码，直接回车即可，最后会提示密钥生成成功，如下图所示，可以看出 `~/.ssh/` 目录下，会新生成两个文件：`id_rsa.pub` 和 `id_rsa`，分别是公钥和私钥文件。
 
 ![ssh-keygen](../images/ssh/ssh_keygen.png)
 
-2，将本地 `.ssh` 目录下的 `id_rsa.pub` 文件内容添加到目标服务器的 `~/.ssh/authorized_keys` 文件中，如果目标服务器没有 `.ssh` 目录，需要先创建 `.ssh` 目录，然后再创建 `authorized_keys` 文件，然后再添加文件内容。
-
-具体操作命令如下:  
+密钥创建完成后，可手动将本地 `.ssh` 目录下的 `id_rsa.pub` 文件内容添加到目标服务器的 `~/.ssh/authorized_keys` 文件中，如果目标服务器没有 `.ssh` 目录，需要先创建 `.ssh` 目录，然后再创建 `authorized_keys` 文件，然后再添加文件内容。具体操作命令如下:  
 
 ```bash
 # 1，本地终端运行命令
@@ -100,7 +98,33 @@ touch ~/.ssh/authorized_keys  # 创建 authorized_keys 文件
 # 3，然后将本地公钥文件内容粘贴到 `authorized_keys` 文件中，保存退出
 ```
 
-如果觉得上述步骤太过繁琐，可通过下面命令，一键完成公钥登录连接的配置:
+上述步骤展开讲是为了让大家理解步骤，实际执行过程，可通过下述 2 条命令自动完成**ssh 基于公钥免输入密码连接远程服务器**:
+
+```bash
+ssh-keygen -t rsa -b 4096 # 生成公钥
+ssh-copy-id -i ~/.ssh/id_rsa.pub user_name@host_ip # 运行后，它会要求你输入一次服务器密码。
+```
+
+如果上述步骤执行完成后，依然要输入密码完成 ssh 连接，可重点检查目录权限问题，以及不要手动复制公钥文件。
+
+```bash
+# 1. 确保你的家目录只有用户自己能写入
+chmod 755 ~
+
+# 2. 确保 .ssh 目录只有用户自己能进
+chmod 700 ~/.ssh
+
+# 3. 远程主机的的公钥文件只有用户自己能读写
+chmod 600 /home/honggao/.ssh/authorized_keys
+```
+
+<center>
+<img src="../images/ssh/ssh_dir_perm.jpg" width="80%" alt="ssh_dir_perm">
+</center>
+
+### 3.2 一行命令配置
+
+**基于公钥登录连接，也可通过一键完成公钥登录连接的配置命令如下**:
     
 ```bash
 $ ssh username@host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys" < ~/.ssh/id_rsa.pub
@@ -110,7 +134,7 @@ $ ssh username@host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys" < ~/.ssh/
 
 `Github` 提交代码的时候，也是通过公钥登录连接的方式，只要将本地的公钥文件内容添加到 github 的 `authorized_keys` 文件中，就可以免密码提交代码了，原理是一模一样的。
 
-## 四，VSCode 远程连接
+## 四 VSCode 远程连接
 
 VSCode 也支持远程连接，可以通过 `Remote-SSH` 插件来实现，具体操作步骤如下:
 
@@ -137,6 +161,7 @@ Host T4
     User username
     # 目标机登录端口
     Port 22
+    IdentityFile ~/.ssh/id_rsa
     # macos系统: ProxyCommand ssh -q -W %h:%p JumpMachine
     ProxyCommand ssh -q -W %h:%p JumpMachine
 ```
